@@ -1,0 +1,57 @@
+@ECHO OFF
+setlocal enabledelayedexpansion
+rem -------------------------
+rem パス定義
+rem -------------------------
+rem --バッチパス	
+	set BAT_ROOT=
+rem --LOGパス
+	set LOGDIR=
+rem --LOGファイル名
+	set LOGFILE=OracleExeLog.log
+rem --SQL呼出ファイルパス
+	set SQLCALLDIR=
+rem --SQL一覧ファイルポス
+	set SQLLISTDIR=
+rem --ORACLEディレクトリパス
+	set ORACLEDIR=   \12.2.0\client_1\bin
+
+rem -------------------------
+rem ORACLE接続情報
+rem -------------------------
+	set ORA_USER_NAME=
+	set ORA_PASSWORD=
+	set ORA_IP_ADDR=
+	set ORA_PORT_NUMBER=
+	set ORA_SERVICE_NAME=
+	
+rem ----------------------
+rem バッチ開始（接続確認）
+rem ----------------------
+@ECHO ON
+ECHO バッチを開始します。 > %LOGDIR%\%LOGFILE%
+ECHO %DATE% %TIME:~0,8% >> %LOGDIR%\%LOGFILE%
+ECHO ORACLE接続先の確認 接続先：%ORA_USER_NAME%/%ORA_PASSWORD%@%ORA_IP_ADDR%:%ORA_PORT_NUMBER%/%ORA_SERVICE_NAME% >> %LOGDIR%\%LOGFILE%
+ECHO DBに接続しますか？ >> %LOGDIR%\%LOGFILE%
+PAUSE
+@ECHO OFF
+
+rem ----------------------
+rem DB接続    
+rem ----------------------
+@ECHO ON
+ECHO %DATE% %TIME:~0,8% >> %LOGDIR%\%LOGFILE%
+@ECHO OFF
+CD %ORACLEDIR%
+SQLPLUS /NOLOG @%SQLCALLDIR%\callsql.sql %ORA_USER_NAME%/%ORA_PASSWORD%@%ORA_IP_ADDR%:%ORA_PORT_NUMBER%/%ORA_SERVICE_NAME% %SQLLISTDIR% >> %LOGDIR%\%LOGFILE%
+
+rem -----------------------
+rem バッチ終了
+rem -----------------------
+@ECHO ON
+ IF %ERRORLEVEL% == 0 ECHO バッチは正常終了しました。 >> %LOGDIR%\%LOGFILE%
+ IF NOT %ERRORLEVEL% == 0 ECHO バッチは異常終了しました。 エラーレベル：%ERRORLEVEL% >> %LOGDIR%\%LOGFILE%
+ECHO %DATE% %TIME:~0,8% >> %LOGDIR%\%LOGFILE%
+PAUSE
+@ECHO OFF
+endlocal
